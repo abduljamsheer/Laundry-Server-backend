@@ -4,11 +4,33 @@ const User = require("../models/user.js");
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 var jwt = require('jsonwebtoken');
+const auth = require("./auth.js");
 
 
 
 
 router.use(express.json());
+router.get("/", auth,async (req, res) => {
+    try {
+        const user = await User.findOne({ _id:req.userId });
+        if(!user){
+            res.status(400).json({
+                status:"Failed"
+            })
+        }
+        res.status(201).json({
+            data:user,
+            status:"Success"
+        })
+        
+    } catch (error) {
+        res.status(400).json({
+                status:"Failed",
+                message:error.message
+            })
+        
+    }
+})
 
 router.post("/register", async (req, res) => {
 
@@ -33,8 +55,6 @@ router.post("/register", async (req, res) => {
             return hash
         }
         const hashed_password = await Hash_Password()
-   
-
         const new_User = {
             name: name,
             email: email,
@@ -47,8 +67,6 @@ router.post("/register", async (req, res) => {
         };
         
         const response = await User.create(new_User);
-    
-
         res.status(201).json({
             status: "Success",
             message: "Register Successfully",
@@ -81,7 +99,6 @@ router.post("/login", async (req, res) => {
         if (response) {
             const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET || 'secret_key@123', { expiresIn: '1h' });
 
-
             return res.json({
                 status: "Success",
                 token: token,
@@ -100,5 +117,37 @@ router.post("/login", async (req, res) => {
         })
     }
 })
+
+
+
+router.patch('/update-profile', auth, async (req, res) => {
+  const { email, oldPassword, newPassword } = req.body;
+  const userId = req.userId;
+
+  try {
+    
+    const user = await User.findById(userId);
+
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Old password is incorrect.' });
+    }
+
+    const isSamePassword = await bcrypt.compare(newPassword, user.password);
+    if (isSamePassword) {
+      return res.status(400).json({ message: 'New password must be different from old password.' });
+    }
+
+    user.email = email;
+    user.password = await bcrypt.hash(newPassword, 10);
+
+    await user.save();
+
+    res.json({ message: 'Profile updated successfully.' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error.' });
+  }
+});
 
 module.exports = router;
