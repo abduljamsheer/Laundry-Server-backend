@@ -12,5 +12,4 @@ const connection = async () => {
         console.log("error while connecting with database", err.message);
     }
 }
-
 module.exports = connection;
