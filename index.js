@@ -7,8 +7,8 @@ const connection = require("./database/db.js");
 const PORT = process.env.PORT || 3001;
 
 const corsOptions = {
-  origin: 'http://localhost:3000', // Allow frontend
-  credentials: true,               // Support cookies if needed
+  origin: 'http://localhost:3000', 
+  credentials: true,               
 };
 app.use(cors(corsOptions));
 app.use(express.json());
