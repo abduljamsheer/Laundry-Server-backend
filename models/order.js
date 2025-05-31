@@ -15,6 +15,7 @@ const orderSchema = mongoose.Schema({
     price: { type: String, required: true },
     status: { type: String, default: "Ready to Pickup" },
     items:{type:Array, required: true},
+    address:{type: String, required: true },
     cart: []
 }, { timestamps: true })
 

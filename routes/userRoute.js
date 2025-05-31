@@ -11,6 +11,7 @@ const auth = require("./auth.js");
 
 router.use(express.json());
 router.get("/", auth,async (req, res) => {
+    
     try {
         const user = await User.findOne({ _id:req.userId });
         if(!user){
@@ -19,7 +20,8 @@ router.get("/", auth,async (req, res) => {
             })
         }
         res.status(201).json({
-            data:user,
+            name:user.name,
+            email:user.email,
             status:"Success"
         })
         
@@ -97,7 +99,7 @@ router.post("/login", async (req, res) => {
         }
         const response = await bcrypt.compare(password, user.password);
         if (response) {
-            const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET || 'secret_key@123', { expiresIn: '1h' });
+            const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET || 'abdul@123', { expiresIn: '1h' });
 
             return res.json({
                 status: "Success",
