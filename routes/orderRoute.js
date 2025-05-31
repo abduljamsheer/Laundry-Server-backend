@@ -52,8 +52,8 @@ router.patch('/:id',Auth, async (req, res) => {
   }
 });
 
-router.use("*", (req, res) => {
-  res.status(500).send("Invalid Url");
-});
+// router.use("*", (req, res) => {
+//   res.status(500).send("Invalid Url");
+// });
 
 module.exports = router;
